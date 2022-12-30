@@ -1,35 +1,101 @@
 Sub stock_screener():
-    Dim lastRow As Integer
-    Dim stock_ticker As String
-    Dim open_price As Variant
-    Dim close_price As Variant
-    Dim price_change As Variant
-    'Dim percentage_price_change As Double
-    Dim volume_total As Integer
-    Dim summary_table_row As Integer
+    For Each ws In Worksheets:
+        Dim ticker As String
+        Dim open_price, close_price, yearly_change, percent_change As Double
+        Dim summary_row As Integer
+        Dim last_row As Long
+        Dim total_volume As Variant
+        
+        last_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        
+        total_volume = 0
+        summary_row = 1
+        
+        ws.Range("I" & summary_row) = "Ticker"
+        ws.Range("J" & summary_row) = "Yearly Change"
+        ws.Range("K" & summary_row) = "Percent Change"
+        ws.Range("L" & summary_row) = "Total Stock Volume"
+        
+        summary_row = 2
+        open_price = ws.Cells(2, 3).Value
+        
+        For i = 2 To last_row
+            ticker = ws.Cells(i, 1).Value
+            
+            total_volume = total_volume + ws.Cells(i, 7).Value
+            
+            If (ticker <> ws.Cells(i + 1, 1).Value) Then
+                
+                close_price = ws.Cells(i, 6).Value
+                yearly_change = close_price - open_price
+                percent_change = yearly_change / open_price
+                
+                ws.Range("I" & summary_row) = ticker
+                ws.Range("J" & summary_row) = yearly_change
+                ws.Range("K" & summary_row) = FormatPercent(percent_change)
+                ws.Range("L" & summary_row) = total_volume
+                
+                If (yearly_change <= 0) Then
+                    ws.Cells(summary_row, 10).Interior.ColorIndex = 3
+                Else: ws.Range("J" & summary_row).Interior.ColorIndex = 4
+                End If
+            
+                open_price = ws.Cells(i + 1, 3).Value
+                total_volume = 0
+                summary_row = summary_row + 1
     
-    summary_table_row = 1
+            End If
+     
+        Next i
+        ws.Range("O1") = "Ticker"
+        ws.Range("P1") = "Value"
+        ws.Range("N2") = "Greatest % Increase"
+        ws.Range("N3") = "Greatest % Decrease"
+        ws.Range("N4") = "Greatest Total Volume"
+        
+        'refactor to use functions that get ticker?
+        'ws.Range("O2") = Application.WorksheetFunction.Max(ws.Range("K2:K" & summary_row))
+        Dim max_ticker As String
+        Dim max_value As Double
+        max_value = ws.Cells(2, 10).Value
+        For i = 3 To summary_row
+            If (ws.Cells(i, 10).Value > max_value) Then
+            max_ticker = ws.Cells(i, 9).Value
+            max_value = ws.Cells(i, 10).Value
+            End If
+        Next i
+        ws.Range("O2").Value = max_ticker
+        ws.Range("P2").Value = max_value
+        
+        'ws.Range("O3") = Application.WorksheetFunction.Min(ws.Range("K2:K" & summary_row))
+        Dim min_ticker As String
+        Dim min_value As Double
+        min_value = ws.Cells(2, 10).Value
+        For i = 3 To summary_row
+            If (ws.Cells(i, 10).Value < min_value) Then
+            min_ticker = ws.Cells(i, 9).Value
+            min_value = ws.Cells(i, 10).Value
+            End If
+        Next i
+        ws.Range("O3").Value = min_ticker
+        ws.Range("P3").Value = min_value
+        
+        'ws.Range("O4") = Application.WorksheetFunction.Max(ws.Range("L2:L" & summary_row))
+        Dim max_volume_ticker As String
+        Dim max_volume_value As Double
+        max_volume_value = ws.Cells(2, 12).Value
+        For i = 3 To summary_row
+            If (ws.Cells(i, 12).Value > max_volume_value) Then
+            max_volume_ticker = ws.Cells(i, 9).Value
+            max_volume_value = ws.Cells(i, 12).Value
+            End If
+        Next i
+        ws.Range("O4").Value = max_volume_ticker
+        ws.Range("P4").Value = max_volume_value
+        
+        ws.Range("A:P").Columns.AutoFit
+    Next
+    '
     
-    Range("I" & summary_table_row).Value = "Ticker"
-    Range("J" & summary_table_row).Value = "Yearly Change"
-    Range("K" & summary_table_row).Value = "Percent Change"
-    Range("L" & summary_table_row).Value = "Total Stock Volume"
-    summary_table_row = summary_table_row + 1
-    
-    lastRow = Cells(Rows.Count, "A").End(xlUp).Row
-    volume_total = 0
-    
-    
-    For I = 2 To lastRow
-        volume_total = volume_total + Cells(I, 7).Value
-        open_price = Cells(I, 3).Value
-            Range("J" & summary_table_row).Value = open_price - Cells(I, 4).Value
-            Range("K" & summary_table_row).Value = (close_price - open_price) / open_price
-            Range("L" & summary_table_row).Value = volume_total
-            summary_table_row = summary_table_row + 1
-            volume_total = 0
-        End If
-    Next I
-
 
 End Sub
