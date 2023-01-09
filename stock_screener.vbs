@@ -19,6 +19,7 @@ Sub stock_screener():
         summary_row = 2
         open_price = ws.Cells(2, 3).Value
         
+        'Calculates each ticker symbol's change and volume
         For i = 2 To last_row
             ticker = ws.Cells(i, 1).Value
             
@@ -47,40 +48,42 @@ Sub stock_screener():
             End If
      
         Next i
+        
+        'Extreme values
         ws.Range("O1") = "Ticker"
         ws.Range("P1") = "Value"
         ws.Range("N2") = "Greatest % Increase"
         ws.Range("N3") = "Greatest % Decrease"
         ws.Range("N4") = "Greatest Total Volume"
         
-        'refactor to use functions that get ticker?
-        'ws.Range("O2") = Application.WorksheetFunction.Max(ws.Range("K2:K" & summary_row))
+
+        'Calculates ticker symbol with best performance
         Dim max_ticker As String
         Dim max_value As Double
-        max_value = ws.Cells(2, 10).Value
+        max_value = ws.Cells(2, 11).Value
         For i = 3 To summary_row
-            If (ws.Cells(i, 10).Value > max_value) Then
+            If (ws.Cells(i, 11).Value > max_value) Then
             max_ticker = ws.Cells(i, 9).Value
-            max_value = ws.Cells(i, 10).Value
+            max_value = ws.Cells(i, 11).Value
             End If
         Next i
         ws.Range("O2").Value = max_ticker
-        ws.Range("P2").Value = max_value
+        ws.Range("P2").Value = FormatPercent(max_value)
         
-        'ws.Range("O3") = Application.WorksheetFunction.Min(ws.Range("K2:K" & summary_row))
+        'Calculates ticker symbol with worst performance
         Dim min_ticker As String
         Dim min_value As Double
-        min_value = ws.Cells(2, 10).Value
+        min_value = ws.Cells(2, 11).Value
         For i = 3 To summary_row
-            If (ws.Cells(i, 10).Value < min_value) Then
+            If (ws.Cells(i, 11).Value < min_value) Then
             min_ticker = ws.Cells(i, 9).Value
-            min_value = ws.Cells(i, 10).Value
+            min_value = ws.Cells(i, 11).Value
             End If
         Next i
         ws.Range("O3").Value = min_ticker
-        ws.Range("P3").Value = min_value
+        ws.Range("P3").Value = FormatPercent(min_value)
         
-        'ws.Range("O4") = Application.WorksheetFunction.Max(ws.Range("L2:L" & summary_row))
+        'Calculates maximum volume per ticker symbol
         Dim max_volume_ticker As String
         Dim max_volume_value As Double
         max_volume_value = ws.Cells(2, 12).Value
@@ -93,9 +96,7 @@ Sub stock_screener():
         ws.Range("O4").Value = max_volume_ticker
         ws.Range("P4").Value = max_volume_value
         
-        ws.Range("A:P").Columns.AutoFit
+        ws.Range("A:Q").Columns.AutoFit
     Next
-    '
-    
 
 End Sub
