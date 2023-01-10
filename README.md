@@ -1,3 +1,3 @@
 # VBA-challenge
 
-Included are testing and final excel files, final vbs file, and screenshots from 2018, 2019, and 2020.
+Included final source code in .vbs and .txt format, and screenshots from 2018, 2019, and 2020.
